@@ -1,0 +1,14 @@
+node_modules/
+dist/
+.vite/
+.git/
+*.user
+*.suo
+*.db
+*.sqlite
+bin/
+obj/
+.idea/
+.vscode/
+.DS_Store
+npm-debug.log*

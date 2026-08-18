@@ -1,0 +1,39 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: fullstack-ec2-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: fullstack_ec2
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d fullstack_ec2"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: ./backend/FullStack.Api
+      dockerfile: Dockerfile
+    container_name: fullstack-ec2-api
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__DefaultConnection: "Host=postgres;Database=fullstack_ec2;Username=postgres;Password=postgres;Port=5432"
+    ports:
+      - "5080:8080"
+
+volumes:
+  postgres_data:
